@@ -9,19 +9,14 @@ void adc_init(){
     prescaler counts when ADEN is set in ADCSRA
 
     adc conversion takes 13 ADC clock cycles 
-    25 cycles on the first start due to initialization 
-
-    change channel after 1 ADC clock cycle after ADSC write
-
-    Safe ways to chance ADMUX
-    a. When ADATE or ADEN is cleared.
-    b. During conversion, minimum one ADC clock cycle after the trigger event.
-    c. After a conversion, before the Interrupt Flag used as trigger source is cleared.
-
-
     */
 
-    ADCSRA |= // bit 2 to 0 
+    //freq_adc = 16MHZ/prescaler
+    // conversion time = 13 cycles / freq_adc
+    //assuming 1kHz sampling 1ms between next sample
+    // 8 channels --> 1ms/8 = 125us 
+    // 104us @ 128 prescaler 
+    ADCSRA |= 0x07; // bit 2 to 0 
     /*
     000     2
     001     2
@@ -32,10 +27,11 @@ void adc_init(){
             64
             128
     */
+    ADMUX |= (1 << 6);   // AVcc as Vref
 
     DIDR0 = 0x3F; // disable digital 
 
-    ADCSRA &= ~(1 << 7); // ADCEN
+    ADCSRA |= (1 << 7); // ADCEN
     
     
 }
@@ -49,6 +45,5 @@ void adc_read(uint16_t* frame){
         frame[i] = ADC;
     }
 
-    
     return;
 }
