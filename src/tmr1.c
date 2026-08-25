@@ -1,6 +1,8 @@
 #include <stdint.h>
 #include <avr/io.h>
 
+static volatile uint64_t msCounter = 0;
+
 void timer1_init(){
     /*
     TCNT1 = counter
@@ -28,6 +30,20 @@ void timer1_init(){
 
     TIMSK1 |= 0x02; //OCIE1A 
 
+    SREG |= 0x80; // GIE
 
     return;
+}
+
+ISR(TIMER1_COMPA_vect){
+    msCounter ++;
+    return;
+}
+
+uint64_t getTime(void){
+    volatile uint64_t time;
+    SREG &= ~0x80; 
+    time = msCounter;
+    SREG |= 0x80;
+    return time;
 }
