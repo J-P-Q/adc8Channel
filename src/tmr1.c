@@ -1,5 +1,6 @@
 #include <stdint.h>
 #include <avr/io.h>
+#include <avr/interrupt.h>
 
 static volatile uint64_t msCounter = 0;
 
