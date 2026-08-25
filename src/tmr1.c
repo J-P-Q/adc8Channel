@@ -16,7 +16,9 @@ void timer1_init(){
     TCCR1B |= 0x08; 
 
     // prescaler
-    TCCR1B |= 0x01;
+    // fOCnx = f_clk / 2 * N * (1 + OCR)
+    // 1kHz = 16MHz / 2 * 64 * (1 + 124)
+    TCCR1B |= 0x03;
     /*
     001     1
     010     8
@@ -26,7 +28,7 @@ void timer1_init(){
     */
 
     TCNT1 = 0x0000;
-    OCR1A = 0x00FF;
+    OCR1A = 124;
 
     TIMSK1 |= 0x02; //OCIE1A 
 
