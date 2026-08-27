@@ -38,10 +38,7 @@ void timer1_init(){
     return;
 }
 
-ISR(TIMER1_COMPA_vect){
-    msCounter ++;
-    return;
-}
+
 
 uint64_t getTime(void){
     volatile uint64_t time;
