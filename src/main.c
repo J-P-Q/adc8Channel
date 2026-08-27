@@ -10,29 +10,49 @@ volatile uint64_t nowTime = 0;
 volatile uint64_t prevTime = 0;
 
 volatile uint16_t frame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+volatile uint8_t transmitReadyFlag = 0;
 
-/*
+volatile uint64_t msCounter = 0;
+
+
 ISR(TIMER1_COMPA_vect){
-  adc_read(frame);
+  msCounter ++;
 
+  if(msCounter >= 5000){
+    //PORTB ^= (1 << 5);
+    adc_read(frame);
+    transmitReadyFlag = 1;
+  }
   return;
 }
-*/
+
 
 int main(void){
-  
+  DDRC &= ~0x1F; 
   DDRB |= (1 << 5);
   PORTB = 0x00;
 
-  //timer1_init();
-  //adc_init();
-  usart0_init();
+  uint8_t frame1;
+  uint8_t frame0;
 
-  
+  adc_init();
+  usart0_init();
+  timer1_init();
+
+  TCNT1 = 249; // INT immediately
+
   while(1){
-    for(uint8_t i = 0; i < 0xFF; i+=16){
-      usart0_transmit(i);
+    if(transmitReadyFlag){
+      PORTB ^= (1 << 5);
+      for(uint8_t i = 0; i < 8; i++){
+        frame1 = (frame[i] >> 8) & 0xFF;
+        frame0 = frame[i] & 0x00FF;
+        usart0_transmit(frame1);
+        usart0_transmit(frame0);
+      }
+      transmitReadyFlag = 0;
     }
+    
   }
     
 
@@ -47,6 +67,13 @@ void testTimer(void){
     PORTB ^= (1 << 5);
     prevTime = nowTime;
 
+  }
+  return;
+}
+
+void testTransmit(void){
+  for(uint8_t i = 0; i < 0xFF; i+=16){
+    usart0_transmit(i);
   }
   return;
 }
