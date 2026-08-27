@@ -30,7 +30,7 @@ int main(void){
 
   
   while(1){
-    for(uint8_t i = 0; i < 0xFF; i++){
+    for(uint8_t i = 0; i < 0xFF; i+=16){
       usart0_transmit(i);
     }
   }
