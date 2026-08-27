@@ -1,0 +1,11 @@
+- 104us per channel conversion time
+- 250k Baud 
+- 1ms allocated for a frame (1 frame = 8 words)
+
+uart packet [1 start][8 data][1 stop] = 10 bits
+10 * 2 * 8 = 160bit
+REQUIREMENT: 160bits/ms = 160k Baud
+
+    IF add checksum 10 * 2 * 9 = 180
+        REQUIREMENT: 180k Baud
+

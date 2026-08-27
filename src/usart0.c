@@ -6,8 +6,8 @@ void usart0_init(){
     UCSR0B |= (1 << 3); // TX EN
     UCSR0C |= (3 << 1); // 8 bit data
 
-    // 38.4k baud
-    UBRR0 = 25;
+    // 250k baud
+    UBRR0 = 3;
     return;
 }
 
