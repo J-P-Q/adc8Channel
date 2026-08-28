@@ -39,14 +39,8 @@ void adc_init(){
     
 }
 
-void adc_read(uint16_t* frame){
-    volatile uint8_t i;
-    for(i = 0; i < 8; i++){
-        ADMUX = (ADMUX & 0xF8) | (i & 0x07);
-        ADCSRA |= (1 << 6); //conversion
-        while(ADCSRA & (1 << 6));
-        frame[i] = ADC;
-    }
-
+void adc_start(void){
+    ADMUX = (ADMUX & 0xF8) | (0 & 0x07); // CH0
+    ADCSRA |= (1 << 6); //conversion
     return;
 }
