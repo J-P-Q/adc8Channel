@@ -20,8 +20,11 @@ volatile uint8_t data0 = 0;
 
 volatile uint8_t channel = 0;
 
+//volatile uint8_t usartTest = 0xff;                                //FOR TESTING
+
 ISR(TIMER1_COMPA_vect){
   adc_start(channel);
+  //usart0_transmit(usartTest);                                     // FOR TESTING
   return;
 }
 
@@ -57,6 +60,7 @@ ISR(USART_UDRE_vect){
     usart0_transmit(ringBuffer[usartIndex]);
     usartIndex = (usartIndex + 1)%32;
     count--;
+    //usartTest--;                                                  // FOR TESTING
   }
   else{
     UCSR0B &= ~(1 << UDRIE0); //disable usart int 
@@ -69,10 +73,6 @@ int main(void){
   DDRB |= (1 << 5);
   PORTB = 0x00;
 
-  uint8_t frame1;
-  uint8_t frame0;
-  uint8_t checkSum1;
-  uint8_t checkSum0;
 
   adc_init();
   usart0_init();
@@ -87,6 +87,7 @@ int main(void){
   return 0;
 }
 
+/*
 void testTimer(void){
   nowTime = getTime();
   if(((uint64_t) nowTime - prevTime) >= 1000){
@@ -103,3 +104,4 @@ void testTransmit(void){
   }
   return;
 }
+*/
