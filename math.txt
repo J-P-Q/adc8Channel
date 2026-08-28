@@ -1,11 +1,23 @@
+AT328p @ 16MHz:
+- 16MHz / 128 adc prescaler = 125kHz
+- 13cycles per conversion / 125kHz = 104us
 - 104us per channel conversion time
-- 250k Baud 
 - 1ms allocated for a frame (1 frame = 8 words)
+
+1000us - (104 * 8)us = 168us remaining for uart before next adc read
 
 uart packet [1 start][8 data][1 stop] = 10 bits
 10 * 2 * 8 = 160bit
-REQUIREMENT: 160bits/ms = 160k Baud
+REQUIREMENT: 160bits/168us = 952k Baud Baud 
+Uses 1Mbps
 
-    IF add checksum 10 * 2 * 9 = 180
-        REQUIREMENT: 180k Baud
+
+PIC16F877a @ 20MHz
+- minimum acceotable is 1.6us of T_AD so prescaler = 32 is the min. 
+- 11 T_AD cycles per channel conversion consider as 13 anyway to be safe
+- acquisition time = 19.72us ~ 20us  
+- 1.6us * 11 = 17.6us per channel | 1.6us * 13 = 20.8us
+- 1000us - (8 * (17.6us + 20us)) = 699.2us | 1000us - (8 * (20us + 20.8us)) = 673.6us
+
+REQUIREMENT: 160bits/ 699.2us = 229kk Baud | 160bits/ 673.6us = 238k Baud 
 
