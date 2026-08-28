@@ -39,8 +39,8 @@ void adc_init(){
     return; 
 }
 
-void adc_start(void){
-    ADMUX = (ADMUX & 0xF8) | (0 & 0x07); // CH0
+void adc_start(uint8_t channel){
+    ADMUX = (ADMUX & 0xF8) | (channel & 0x07); // CH0
     ADCSRA |= (1 << 6); //conversion
     return;
 }
