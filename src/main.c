@@ -73,7 +73,6 @@ int main(void){
   DDRB |= (1 << 5);
   PORTB = 0x00;
 
-
   adc_init();
   usart0_init();
   timer1_init();
