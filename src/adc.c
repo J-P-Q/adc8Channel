@@ -31,6 +31,9 @@ void adc_init(){
 
     DIDR0 = 0x3F; // disable digital 
 
+    ADCSRA |= (1 << 3); //ADIE
+    SREG |= 0x80; // GIE
+
     ADCSRA |= (1 << 7); // ADCEN
     
     
