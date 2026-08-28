@@ -35,8 +35,8 @@ void adc_init(){
     SREG |= 0x80; // GIE
 
     ADCSRA |= (1 << 7); // ADCEN
-    
-    
+
+    return; 
 }
 
 void adc_start(void){
