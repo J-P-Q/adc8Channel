@@ -13,12 +13,28 @@ volatile uint16_t frame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
 volatile uint8_t transmitReadyFlag = 0;
 volatile uint16_t checkSum = 0; 
 
+volatile uint8_t channel = 0;
+
 ISR(TIMER1_COMPA_vect){
-  adc_read(frame);
-  transmitReadyFlag = 1;
+  adc_read(channel);
   return;
 }
 
+ISR(ADC_vect){
+  frame[channel] = ADC;
+  transmitReadyFlag = 1;
+
+  if(channel < 7){
+   channel++;
+   adc_start(channel); 
+  }
+
+  else{
+    channel = 0;
+  }
+
+  return;
+}
 
 int main(void){
   DDRC &= ~0x1F; 
