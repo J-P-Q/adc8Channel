@@ -9,20 +9,24 @@
 volatile uint64_t nowTime = 0;
 volatile uint64_t prevTime = 0;
 
-volatile uint16_t frame[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-volatile uint8_t transmitReadyFlag = 0;
-volatile uint16_t checkSum = 0; 
+volatile uint8_t ringBuffer[32];
+volatile uint8_t usartIndex = 0;
+volatile uint8_t adcIndex = 0;
+volatile uint8_t count = 0; //Total in ring buffer
+
+volatile uint16_t data = 0;
+volatile uint8_t data1 = 0;
+volatile uint8_t data0 = 0;
 
 volatile uint8_t channel = 0;
 
 ISR(TIMER1_COMPA_vect){
-  adc_read(channel);
+  adc_start(channel);
   return;
 }
 
 ISR(ADC_vect){
-  frame[channel] = ADC;
-  transmitReadyFlag = 1;
+  data = ADC;
 
   if(channel < 7){
    channel++;
@@ -33,7 +37,31 @@ ISR(ADC_vect){
     channel = 0;
   }
 
+  data1 = (data >> 8) & 0xFF;
+  data0 = data & 0x00FF;
+  
+  ringBuffer[adcIndex] = data1;
+  count++;
+  adcIndex = (adcIndex + 1)%32;
+
+  ringBuffer[adcIndex] = data0;
+  count++;
+  adcIndex = (adcIndex + 1)%32;
+
+  UCSR0B |= (1 << UDRIE0);    // Enable usart int
   return;
+}
+
+ISR(USART_UDRE_vect){
+  if(count > 0){
+    usart0_transmit(ringBuffer[usartIndex]);
+    usartIndex = (usartIndex + 1)%32;
+    count--;
+  }
+  else{
+    UCSR0B &= ~(1 << UDRIE0); //disable usart int 
+  }
+  return; 
 }
 
 int main(void){
@@ -53,28 +81,9 @@ int main(void){
   TCNT1 = 249; // INT immediately
 
   while(1){
-    if(transmitReadyFlag){
-      //checkSum = 0;
-      for(uint8_t i = 0; i < 8; i++){
-        frame1 = (frame[i] >> 8) & 0xFF;
-        frame0 = frame[i] & 0x00FF;
-        usart0_transmit(frame0);
-        usart0_transmit(frame1);
-
-        //checkSum = checkSum + frame[i];
-      }
-      //checkSum1 = (checkSum >> 8) & 0xFF;
-      //checkSum0 = checkSum & 0x00FF;
-      //usart0_transmit(checkSum0);
-      //usart0_transmit(checkSum1);
-      transmitReadyFlag = 0;
-    }
     
   }
     
-
-  
-
   return 0;
 }
 

@@ -8,11 +8,12 @@ void usart0_init(){
 
     // 250k baud
     UBRR0 = 3;
+
+    //UCSR0B |= (1 << 5); // data reg empty IE
     return;
 }
 
 void usart0_transmit(uint8_t data){
-    while(!(UCSR0A & 0x20)); // data reg empty
     UDR0 = data;
     
     return;
