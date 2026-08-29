@@ -24,6 +24,8 @@ volatile uint8_t channel = 0;
 
 ISR(TIMER1_COMPA_vect){
   adc_start(channel);
+  usart0_transmit(0xAA);    // Start Byte
+  UCSR0B |= (1 << UDRIE0);    // Enable usart int
   //usart0_transmit(usartTest);                                     // FOR TESTING
   return;
 }
